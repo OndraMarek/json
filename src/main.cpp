@@ -19,6 +19,8 @@ NTPClient timeClient(ntpUDP, "europe.pool.ntp.org");
 const uint8_t servoPin = D2;
 Servo servo;
 
+String sliderValue = "0";
+
 int otevrit = 180;
 int zavrit = 0;
 //TEST
@@ -140,9 +142,16 @@ void htmlRequests()
     request->send_P(200, "text/json", "{\"result\":\"ok\"}");
   });
 
-  server.on("/settime", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send_P(200, "text/json", "{\"result\":\"ok\"}");
-  });
+  server.on("/api", HTTP_GET, [] (AsyncWebServerRequest *request) {
+        String message;
+        if (request->hasParam("data")) {
+            message = request->getParam("data")->value();
+            sliderValue = message;
+        } else {
+            message = "No message sent";
+        }
+        request->send(200, "text/plain", "Hello, GET: " + message);
+    });
 }
 
 void setup()
